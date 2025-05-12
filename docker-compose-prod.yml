@@ -1,4 +1,4 @@
-version: '3.8'
+# version: '3.8'
 
 services:
   db:
@@ -18,13 +18,23 @@ services:
         - 'glados/api'
     command: gunicorn run:app -w 2 --threads 2 -b 0.0.0.0:${SERVER_PORT:-5000}
     volumes:
-      - ./app:/app
+      - ./glados-api-draft-master/app:/app
     ports:
       - ${SERVER_PORT:-5000}:5000
     env_file:
       - .env
     depends_on:
       - db
+
+  front:
+    image: 'glados/front'
+    build: 
+      context: ./glados-front-draft-master
+      dockerfile: docker/Dockerfile
+    depends_on:
+      - server
+    ports:
+      - "8080:80"
 
 volumes:
   db_glados:

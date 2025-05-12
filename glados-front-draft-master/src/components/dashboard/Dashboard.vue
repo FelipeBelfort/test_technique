@@ -35,6 +35,7 @@ export default {
           this.entities = entities
         })
         .catch((error) => {
+          // eslint-disable-next-line
           console.error(error)
           this.isError = true
         })
