@@ -59,6 +59,13 @@ def test_get_entities_with_invalid_status_data(client):
     }}
 
 
+def test_get_entities_with_invalid_room_data(client):
+    response = client.get("/entities?room=invalid")
+
+    assert response.status_code == 200
+    assert response.json == []
+
+
 def test_get_entities(client, entities, mocker):
     response = client.get("/entities")
 
@@ -126,6 +133,22 @@ def test_get_entities_with_status_filter(client, entities, mocker):
             "type": "sensor",
             "status": "on",
             "value": "28",
+            "created_at": mocker.ANY
+        }
+    ]
+
+
+def test_get_entities_with_room_filter(client, entities, mocker):
+    response = client.get("/entities?room=Kitchen")
+
+    assert response.status_code == 200
+    assert response.json == [
+        {
+            "id": "00000000-0000-0000-0000-000000000001",
+            "name": "Ceiling Light",
+            "type": "light",
+            "status": "off",
+            "value": None,
             "created_at": mocker.ANY
         }
     ]
