@@ -35,14 +35,18 @@ services:
       - db
 
   front:
-    image: 'glados/front'
-    build: 
-      context: ./glados-front-draft-master
-      dockerfile: docker/Dockerfile
+    image: node:18
+    working_dir: /app
+    command: npm run serve
+    env_file:
+      - .env
+    volumes:
+      - ./glados-front-draft-master:/app
     depends_on:
       - server
     ports:
-      - "8080:80"
+      - "8080:8080"
+
 
 volumes:
   db_glados:

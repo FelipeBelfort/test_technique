@@ -25,15 +25,5 @@ services:
     depends_on:
       - db_test
 
-  front:
-    image: 'glados/front'
-    build: 
-      context: ./glados-front-draft-master
-      dockerfile: docker/Dockerfile
-    depends_on:
-      - server
-    ports:
-      - "8080:80"
-
 volumes:
   db_glados_test:
