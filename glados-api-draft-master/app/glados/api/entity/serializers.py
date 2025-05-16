@@ -9,8 +9,10 @@ class EntitiesRequestSerializer(ma.Schema):
     status = fields.String(required=False, validate=validate.OneOf([x.name for x in constants.EntityStatus]))
     room = fields.String(required=False)
 
+
 class EntitySerializer(ma.Schema):
     created_at = fields.DateTime("%Y-%m-%dT%H:%M:%S")
+    room = fields.Function(lambda obj: obj.room.name if obj.room else None)
 
     class Meta:
         model = Entity
@@ -21,7 +23,8 @@ class EntitySerializer(ma.Schema):
             "type",
             "status",
             "value",
-            "created_at"
+            "created_at",
+            "room",
         ]
 
 
