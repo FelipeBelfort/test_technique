@@ -13,14 +13,14 @@
             <option
               v-for="option in field.options"
               :key="option"
-              :value="option" >{{ option }}</option>
+              :value="option" >{{ option.replace(/_/g, " ") }}</option>
           </select>
 
         </span>
         <button 
           @click="getEntities"
           class="px-3 py-1 ml-1 bg-indigo-600 text-white rounded text-sm hover:bg-indigo-700">
-          Sort
+          Search
         </button>
       </span>
     </div>
@@ -44,11 +44,11 @@
 </template>
 
 <script>
+import { ENTITY_STATUSES, ENTITY_TYPES } from "@/constants/entityConstants"
+import coreApi from "@/providers/core-api"
+import EmptyState from "@/components/emptyState/EmptyState.vue"
 import EntityCard from "@/components/cards/EntityCard.vue"
 import EntityDetailsCard from "@/components/cards/EntityDetailsCard.vue"
-import EmptyState from "@/components/emptyState/EmptyState.vue"
-import coreApi from "@/providers/core-api"
-import { ENTITY_TYPES, ENTITY_STATUSES } from "@/constants/entityConstants"
 
 export default {
   name: "Dashboard",
@@ -59,10 +59,12 @@ export default {
   },
   created() {
     this.getEntities()
+    this.getRooms()
   },
   data() {
     return {
       entities: [],
+      rooms: [],
       selected: null,
       isLoading: false,
       isError: false,
@@ -72,9 +74,21 @@ export default {
         room: ""
       },
       filterFields: [
-        { key: "type", label: "Type", options: ENTITY_TYPES },
-        { key: "status", label: "Status", options: ENTITY_STATUSES },
-        { key: "room", label: "Room", options: [] }
+        {
+          key: "type",
+          label: "Type",
+          options: ENTITY_TYPES 
+        },
+        {
+          key: "status",
+          label: "Status",
+          options: ENTITY_STATUSES 
+        },
+        {
+          key: "room",
+          label: "Room",
+          options: [] 
+        }
       ]
     }
   },
@@ -99,6 +113,22 @@ export default {
             status: "",
             room: ""
           },
+          this.isLoading = false
+        })
+    },
+    getRooms() {
+      this.isLoading = true
+      coreApi.glados.getRooms()
+        .then((rooms) => {
+          this.rooms = rooms
+        })
+        .catch((error) => {
+          // eslint-disable-next-line
+          console.error(error)
+          this.isError = true
+        })
+        .finally(() => {
+          this.filterFields[2].options = this.rooms.map(obj => obj.name)
           this.isLoading = false
         })
     },

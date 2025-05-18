@@ -14,10 +14,32 @@ function getRequestUrl(filters) {
 }
 
 export default {
+  //  Entities API //
   getEntities(filters) {
 
     const requestUrl = getRequestUrl(filters)
 
     return coreApiClient.sendRequest("get", requestUrl, {})
+  },
+
+  //  Rooms API //
+  getRooms() {
+    return coreApiClient.sendRequest("get", "/rooms", {})
+  },
+
+  getRoomEntities(id) {
+    return coreApiClient.sendRequest("get", `/rooms/${id}`, {})
+  },
+
+  createRoom(roomName) {
+    return coreApiClient.sendRequest("post", "/rooms", { "name": roomName })
+  },
+
+  renameRoom(room) {
+    return coreApiClient.sendRequest("patch", `/rooms/${room.id}`, { "name": room.name })
+  },
+
+  deleteRoom(roomId) {
+    return coreApiClient.sendRequest("delete", `/rooms/${roomId}`, {})
   },
 }

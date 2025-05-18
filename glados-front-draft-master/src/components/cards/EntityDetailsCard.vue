@@ -4,10 +4,11 @@
     @click.self="$emit('close')">
     <div class="bg-white rounded-xl p-6 shadow-lg max-w-md w-full">
       <h3 class="text-xl font-bold mb-2">{{ entity.name }}</h3>
+      <p><strong>Room:</strong> {{ entity.room ?? "N/A" }}</p>
       <p class="flex flex-row gap-1">
-        <strong>Type:</strong> <component :is="typeIcon"/> {{ entity.type }}</p>
+        <strong>Type:</strong> <component :is="typeIcon"/> {{ entity.type.replace(/_/g, " ") }}</p>
       <p><strong>Status:</strong> {{ entity.status }}</p>
-      <p><strong>Value:</strong> {{ entity.value ?? '-' }}</p>
+      <p><strong>Value:</strong> {{ entity.value ?? "-" }}</p>
       <p class="text-sm text-gray-500 mt-2">Created at: {{ formatDate(entity.created_at) }}</p>
 
       <div class="mt-6 flex justify-end">

@@ -27,6 +27,10 @@ export default {
           name: "dashboard"
         },
         {
+          label: "Rooms",
+          name: "rooms"
+        },
+        {
           label: "About",
           name: "about"
         }
