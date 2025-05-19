@@ -70,6 +70,16 @@ def test_post_room(client, rooms, mocker):
     }
 
 
+def test_post_room_with_incomplete_data(client, rooms, mocker):
+    response = client.post("/rooms", json={})
+
+    assert response.status_code == 422
+    assert response.json == {
+        'errors': 
+        {'name': ['Missing data for required field.']}
+    }
+
+
 def test_patch_room(client, rooms, mocker):
     response = client.patch("/rooms/00000000-0000-0000-0000-000000000001", json={"name": "Kitchen2"})
 

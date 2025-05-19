@@ -3,10 +3,9 @@
     type="submit"
     :disabled="disabled || loading"
     class="
-      inline-flex justify-center items-center py-2 px-4 border border-transparent shadow-sm font-medium rounded-md text-white bg-indigo-600
+      inline-flex justify-center items-center py-2 px-4 border border-transparent shadow-sm font-medium rounded-md text-white
       transition-colors duration-300
-      hover:bg-indigo-500
-      focus:bg-indigo-700 focus:outline-none
+      focus:outline-none
       disabled:bg-gray-300 disabled:text-gray-400 disabled:cursor-not-allowed"
     :class="[classes, colorClasses]">
     {{ label }}
@@ -59,6 +58,7 @@ export default {
     },
     colorClasses() {
       const COLORS_MAP = { 
+        default: "bg-indigo-600 hover:bg-indigo-500 focus:bg-indigo-700",
         danger: "bg-red-600 hover:bg-red-500 focus:bg-red-700",
         on: "bg-green-600 hover:bg-green-500 focus:bg-green-700",
         neutral: "bg-gray-600 hover:bg-gray-500 focus:bg-gray-700"

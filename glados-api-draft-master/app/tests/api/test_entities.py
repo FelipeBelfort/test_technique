@@ -159,3 +159,149 @@ def test_get_entities_with_room_filter(client, entities, mocker):
             "room": "Kitchen"
         }
     ]
+
+
+def test_get_entities_with_multiple_filters(client, entities, mocker):
+    response = client.get("/entities?status=on&type=light")
+
+    assert response.status_code == 200
+    assert response.json == [
+        {
+            "id": "00000000-0000-0000-0000-000000000002",
+            "name": "Lamp",
+            "type": "light",
+            "status": "on",
+            "value": "200",
+            "created_at": mocker.ANY,
+            "room": "Living Room"
+        },
+    ]
+
+
+def test_post_entity(client, entities, mocker):
+    response = client.post("/entities", json={
+        "name": "Kitchen light",
+        "type": constants.EntityType.light.name,
+        "status": constants.EntityStatus.off.name,
+        "value": None,
+        "room_id": "00000000-0000-0000-0000-000000000001",
+    })
+
+    assert response.status_code == 201
+    assert response.json == {
+        "id": mocker.ANY,
+        "name": "Kitchen light",
+        "type": "light",
+        "status": "off",
+        "value": None,
+        "created_at": mocker.ANY,
+        "room": "Kitchen"
+    }
+
+
+def test_post_entity_with_incomplete_data(client, entities, mocker):
+    response = client.post("/entities", json={
+        "name": "Kitchen light",
+        "value": None,
+        "room_id": "00000000-0000-0000-0000-000000000001",
+    })
+
+    assert response.status_code == 422
+    assert response.json == {
+        'errors': {
+            'status': ['Missing data for required field.'], 
+            'type': ['Missing data for required field.']
+        }
+    }
+
+
+def test_post_entity_with_not_found_room(client, entities, mocker):
+    response = client.post("/entities", json={
+        "name": "Kitchen light",
+        "type": constants.EntityType.light.name,
+        "status": constants.EntityStatus.off.name,
+        "value": None,
+        "room_id": "00000000-0000-0000-0000-000000000010",
+    })
+
+    assert response.status_code == 404
+    assert response.json == {
+        'message':
+        'The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.'
+    }
+
+
+def test_patch_entity(client, entities, mocker):
+    response = client.patch("/entities/00000000-0000-0000-0000-000000000001", json={
+        "status": "on",
+        "name": "new name"
+    })
+
+    print(response.json)
+    assert response.status_code == 200
+    assert response.json == {
+        "id": "00000000-0000-0000-0000-000000000001",
+        "name": "new name",
+        "type": "light",
+        "status": "on",
+        "value": None,
+        "created_at": mocker.ANY,
+        "room": "Kitchen"
+    }
+
+
+def test_patch_entity_with_invalid_id(client, entities, mocker):
+    response = client.patch("/entities/invalid", json={"name": "New name"})
+
+    assert response.status_code == 422
+    assert response.json == {
+        'errors':
+        {'id': ['Not a valid UUID.']}
+    }
+
+
+def test_patch_entity_with_invalid_data(client, entities, mocker):
+    response = client.patch("/entities/00000000-0000-0000-0000-000000000001", json={"type": "invalid"})
+
+    assert response.status_code == 422
+    assert response.json == {"errors": {
+        "type": ["Must be one of: sensor, light, switch, multimedia, air_conditioner."]
+    }}
+
+
+def test_patch_entity_with_not_found_data(client, entities, mocker):
+    response = client.patch("/entities/00000000-0000-0000-0000-000000000010", json={"name": "New name"})
+
+    assert response.status_code == 404
+    assert response.json == {
+        'message':
+        'The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.'
+    }
+
+
+def test_delete_entity(client, entities, mocker):
+    response = client.delete("/entities/00000000-0000-0000-0000-000000000001")
+
+    assert response.status_code == 204
+    get = client.get("/entities")
+    assert all(entity["id"] != "00000000-0000-0000-0000-000000000001" for entity in get.get_json())
+
+
+def test_delete_entity_with_not_found_data(client, entities, mocker):
+    response = client.delete("/entities/00000000-0000-0000-0000-000000000010")
+
+    assert response.status_code == 404
+    assert response.json == {
+        'message':
+        'The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.'
+    }
+
+
+def test_delete_entity_with_invalid_data(client, entities, mocker):
+    response = client.delete("/entities/invalid")
+
+    assert response.status_code == 422
+    assert response.json == {
+        'errors':
+        {'id': ['Not a valid UUID.']}
+    }

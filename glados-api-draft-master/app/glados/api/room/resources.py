@@ -2,7 +2,7 @@ from flask import request
 from flask_restful import Resource
 from glados import db
 
-from glados.api.room.serializers import RoomResponseSerializer, RoomsRequestSerializer
+from glados.api.room.serializers import RoomResponseSerializer, RoomsRequestSerializer, RoomsCreationSerializer
 from glados.api.entity.serializers import EntityResponseSerializer
 from glados.repositories.rooms import get_rooms, get_room_by_id, create_room
 
@@ -16,7 +16,7 @@ class RoomsAPI(Resource):
 
     def post(self):
         serializer = RoomResponseSerializer()
-        request_serializer = RoomsRequestSerializer()
+        request_serializer = RoomsCreationSerializer()
 
         room_data = request_serializer.load(request.get_json())
         room = create_room(room_data)
