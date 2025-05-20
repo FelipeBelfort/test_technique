@@ -53,6 +53,7 @@ export default {
       const SIZES_MAP = { 
         large: "uppercase text-2xl py-3 px-7 font-bold tracking-wider",
         small: "py-1 px-2 text-xs",
+        statusButton: "uppercase text-lg py-0"
       }
       return SIZES_MAP[this.size] || ""
     },

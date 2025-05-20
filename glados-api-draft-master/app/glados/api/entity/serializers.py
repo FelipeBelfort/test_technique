@@ -38,6 +38,7 @@ class EntitySerializer(ma.Schema):
             "value",
             "created_at",
             "room",
+            "room_id",
         ]
 
 

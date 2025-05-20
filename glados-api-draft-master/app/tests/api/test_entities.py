@@ -78,7 +78,8 @@ def test_get_entities(client, entities, mocker):
             "status": "off",
             "value": None,
             "created_at": mocker.ANY,
-            "room": "Kitchen"
+            "room": "Kitchen",
+            "room_id": "00000000-0000-0000-0000-000000000001"
         },
         {
             "id": "00000000-0000-0000-0000-000000000002",
@@ -87,7 +88,8 @@ def test_get_entities(client, entities, mocker):
             "status": "on",
             "value": "200",
             "created_at": mocker.ANY,
-            "room": "Living Room"
+            "room": "Living Room",
+            "room_id": "00000000-0000-0000-0000-000000000002"
         },
         {
             "id": "00000000-0000-0000-0000-000000000003",
@@ -96,7 +98,8 @@ def test_get_entities(client, entities, mocker):
             "status": "on",
             "value": "28",
             "created_at": mocker.ANY,
-            "room": "Living Room"
+            "room": "Living Room",
+            "room_id": "00000000-0000-0000-0000-000000000002"
         }
     ]
 
@@ -113,7 +116,8 @@ def test_get_entities_with_type_filter(client, entities, mocker):
             "status": "on",
             "value": "28",
             "created_at": mocker.ANY,
-            "room": "Living Room"
+            "room": "Living Room",
+            "room_id": "00000000-0000-0000-0000-000000000002"
         }
     ]
 
@@ -130,7 +134,8 @@ def test_get_entities_with_status_filter(client, entities, mocker):
             "status": "on",
             "value": "200",
             "created_at": mocker.ANY,
-            "room": "Living Room"
+            "room": "Living Room",
+            "room_id": "00000000-0000-0000-0000-000000000002"
         },
         {
             "id": "00000000-0000-0000-0000-000000000003",
@@ -139,7 +144,8 @@ def test_get_entities_with_status_filter(client, entities, mocker):
             "status": "on",
             "value": "28",
             "created_at": mocker.ANY,
-            "room": "Living Room"
+            "room": "Living Room",
+            "room_id": "00000000-0000-0000-0000-000000000002"
         }
     ]
 
@@ -156,7 +162,8 @@ def test_get_entities_with_room_filter(client, entities, mocker):
             "status": "off",
             "value": None,
             "created_at": mocker.ANY,
-            "room": "Kitchen"
+            "room": "Kitchen",
+            "room_id": "00000000-0000-0000-0000-000000000001"
         }
     ]
 
@@ -173,7 +180,8 @@ def test_get_entities_with_multiple_filters(client, entities, mocker):
             "status": "on",
             "value": "200",
             "created_at": mocker.ANY,
-            "room": "Living Room"
+            "room": "Living Room",
+            "room_id": "00000000-0000-0000-0000-000000000002"
         },
     ]
 
@@ -195,7 +203,8 @@ def test_post_entity(client, entities, mocker):
         "status": "off",
         "value": None,
         "created_at": mocker.ANY,
-        "room": "Kitchen"
+        "room": "Kitchen",
+        "room_id": "00000000-0000-0000-0000-000000000001",
     }
 
 
@@ -237,7 +246,6 @@ def test_patch_entity(client, entities, mocker):
         "name": "new name"
     })
 
-    print(response.json)
     assert response.status_code == 200
     assert response.json == {
         "id": "00000000-0000-0000-0000-000000000001",
@@ -246,7 +254,8 @@ def test_patch_entity(client, entities, mocker):
         "status": "on",
         "value": None,
         "created_at": mocker.ANY,
-        "room": "Kitchen"
+        "room": "Kitchen",
+        "room_id": "00000000-0000-0000-0000-000000000001"
     }
 
 

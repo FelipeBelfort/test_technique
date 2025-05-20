@@ -4,7 +4,7 @@ from glados.models import Room
 def get_rooms():
     query = Room.query
 
-    return query
+    return query.order_by(Room.name.asc()).all()
 
 
 def get_room_by_id(id):

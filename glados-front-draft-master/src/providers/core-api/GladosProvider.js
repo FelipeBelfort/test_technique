@@ -22,6 +22,18 @@ export default {
     return coreApiClient.sendRequest("get", requestUrl, {})
   },
 
+  patchEntity(id, json) {
+    return coreApiClient.sendRequest("patch", `/entities/${id}`, json)
+  },
+
+  createEntity(json) {
+    return coreApiClient.sendRequest("post", "/entities", json)
+  },
+
+  deleteEntity(entityId) {
+    return coreApiClient.sendRequest("delete", `/entities/${entityId}`, {})
+  },
+
   //  Rooms API //
   getRooms() {
     return coreApiClient.sendRequest("get", "/rooms", {})

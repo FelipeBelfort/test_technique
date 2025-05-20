@@ -16,7 +16,7 @@ def get_entities(filters):
     if room:
         query = query.join(Room).filter(Room.name.ilike(room))
 
-    return query
+    return query.order_by(Entity.name.asc()).all()
 
 
 def create_entity(data):

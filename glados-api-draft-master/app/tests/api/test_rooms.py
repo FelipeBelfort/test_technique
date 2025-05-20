@@ -113,7 +113,8 @@ def test_get_entities_from_the_room(client, rooms, mocker):
             "status": "off",
             "value": None,
             "created_at": mocker.ANY,
-            "room": "Kitchen"
+            "room": "Kitchen",
+            "room_id": "00000000-0000-0000-0000-000000000001",
         }
     ]
 
