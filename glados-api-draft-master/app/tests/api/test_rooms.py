@@ -75,7 +75,7 @@ def test_post_room_with_incomplete_data(client, rooms, mocker):
 
     assert response.status_code == 422
     assert response.json == {
-        'errors': 
+        'errors':
         {'name': ['Missing data for required field.']}
     }
 

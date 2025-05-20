@@ -38,9 +38,7 @@ import getTypeIcon from "@/utils/entityTypeIcons.js"
   
 export default {
   name: "EntityDetailsCard",
-  components: {
-    Button,
-  },
+  components: { Button, },
   props: {
     entity: {
       type: Object,

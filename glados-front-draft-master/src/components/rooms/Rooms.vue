@@ -1,11 +1,13 @@
 <template>
   <div class="flex flex-col gap-5">
     <div class="flex flex-row justify-between items-center">
-      <span class="text-indigo-600 font-bold text-2xl">Room Manager</span>
+      <span 
+        class="text-indigo-600 font-bold text-2xl cursor-pointer"
+        @click="getRooms">Room Manager</span>
       <span class="flex gap-2">
         <Button 
           label="Rename"
-          @click="isEditing=true"
+          @click="isEditing=true; showRoomForm=true"
           :disabled="!selectedRoom"/>
         <Button 
           label="delete"
@@ -23,7 +25,7 @@
           <Button 
             label="+ Add Room"
             size="small"
-            @click="isCreating=true"/>
+            @click="showRoomForm=true"/>
         </div>
         <ul class="space-y-2">
           <li
@@ -42,10 +44,10 @@
           v-if="selectedRoom"
           class="text-lg font-semibold mb-4">
           Entities in {{ selectedRoom.name }}</h3>  
-        <div v-if="entities.length">
+        <div v-if="roomEntities.length">
           <div class="space-y-4">
             <template
-              v-for="field in fields"
+              v-for="field in filterFields"
               :key="field">
               <div
                 v-for="option in field.options"
@@ -54,7 +56,7 @@
                 <h4 class="font-bold text-indigo-700 capitalize">
                   <div class="flex gap-4 items-center p-2">
                     {{ option.replace(/_/g, " ") }}
-                    <Button
+                    <!-- <Button
                       v-if="option === 'on'"
                       label="Turn Off All Entities"
                       size="small"
@@ -65,17 +67,18 @@
                       label="Turn On All Entities"
                       size="small"
                       color="on"
-                      :disabled="statuses['off']"/>
+                      :disabled="statuses['off']"/> -->
                   </div>
                 </h4>
                 <div class="overflow-x-auto w-full">
                   <div class="flex space-x-4">
                     <EntityCard
-                      v-for="entity in filteredBy(field.key, option)"
+                      v-for="entity in roomEntities.filter(e => e[field.key] === option)"
                       :key="entity.id"
                       class="min-w-[300px] flex-shrink-0"
                       :entity="entity"
-                      @click="selectEntity(entity)"/>
+                      @toggle="toggleEntityStatus(entity, roomEntities)"
+                      @click="selectedEntity=entity"/>
                   </div>
                 </div>
               </div>
@@ -96,34 +99,45 @@
     <EntityDetailsCard
       v-if="selectedEntity"
       :entity="selectedEntity"
+      @delete="isDeleting=true"
+      @edit="showEntityForm=true"
       @close="selectedEntity = null"/>
 
     <ConfirmDeleteCard 
       v-if="isDeleting"
-      itemType="Room"
-      :obj="selectedRoom"
+      :itemType="selectedEntity ? 'Entity' : 'Room'"
+      :obj="selectedEntity ?? selectedRoom"
       @close="isDeleting=false"
-      @confirm="deleteRoom"/>
+      @confirm="() => handleDelete(selectedEntity ? deleteEntity : deleteRoom)"/>
+
+    <FormEntityModal
+      v-if="showEntityForm"
+      :entity="selectedEntity"
+      :existingEntities="roomEntities"
+      :rooms="rooms"
+      @submit="handleEntityFormSubmit"
+      @close="showEntityForm=false; selectedEntity=null"/>
 
     <FormRoomModal
-      v-if="isCreating || isEditing"
-      :existingRooms="rooms.map(r => r.name)"
+      v-if="showRoomForm"
+      :existingRooms="roomsNames"
       :room="getRoomToForm()"
-      @submit="editRoom"
-      @close="isCreating=isEditing=false"/>
+      @submit="handleRoomFormSubmit"
+      @close="showRoomForm=isEditing=false"/>
   </div>
 </template>
   
 
 <script>
-import { ENTITY_STATUSES, ENTITY_TYPES } from "@/constants/entityConstants"
 import Button from "@/components/buttons/Button.vue"
 import ConfirmDeleteCard from "@/components/cards/ConfirmDeleteCard.vue"
-import coreApi from "@/providers/core-api"
 import EmptyState from "@/components/emptyState/EmptyState.vue"
 import EntityCard from "@/components/cards/EntityCard.vue"
 import EntityDetailsCard from "@/components/cards/EntityDetailsCard.vue"
+import FormEntityModal from "@/components/forms/FormEntityModal.vue"
 import FormRoomModal from "@/components/forms/FormRoomModal.vue"
+import useEntities from "@/composables/useEntities"
+import useRooms from "@/composables/useRooms"
 
 export default {
   name: "Rooms",
@@ -132,156 +146,69 @@ export default {
     EntityDetailsCard,
     EmptyState,
     Button,
+    FormEntityModal,
     FormRoomModal,
     ConfirmDeleteCard
   },
-  created() {
-    this.getRooms()
-  },
-  data() {
+  setup() {
+    const {
+      isLoading,
+      isDeleting,
+      isEditing,
+      isError,
+      selectedRoom,
+      rooms,
+      roomsNames,
+      getRooms,
+      showRoomForm,
+      roomEntities,
+      handleRoomFormSubmit,
+      handleDelete,
+      deleteRoom,
+      selectRoom,
+      getRoomToForm,
+      getRoomEntities,
+    } = useRooms()
+
+    const {
+      showEntityForm,
+      filterFields,
+      selectedEntity,
+      selectEntity,
+      handleEntityFormSubmit,
+      toggleEntityStatus,
+      deleteEntity
+    } = useEntities()
+
+    getRooms()
+
     return {
-      entities: [],
-      rooms: [],
-      statuses: {
-        on: false,
-        off: false 
-      },
-      selectedEntity: null,
-      selectedRoom: null,
-      isLoading: false,
-      isError: false,
-      isCreating: false,
-      isEditing: false,
-      isDeleting: false,
-      fields: [
-        {
-          key: "status",
-          label: "Status",
-          options: ENTITY_STATUSES 
-        },
-        {
-          key: "type",
-          label: "Type",
-          options: ENTITY_TYPES 
-        },
-      ]
+      // useRooms
+      isLoading,
+      isDeleting,
+      isEditing,
+      isError,
+      selectedEntity,
+      selectedRoom,
+      rooms,
+      roomsNames,
+      getRooms,
+      showRoomForm,
+      roomEntities,
+      handleRoomFormSubmit,
+      handleDelete,
+      deleteRoom,
+      selectRoom,
+      getRoomToForm,
+      getRoomEntities,
+      // useEntities
+      showEntityForm,
+      filterFields,
+      selectEntity,
+      handleEntityFormSubmit,
+      toggleEntityStatus,
+      deleteEntity
     }
   },
-  methods: { 
-    getRoomEntities(room) {
-      this.isLoading = true
-      coreApi.glados.getRoomEntities(room.id)
-        .then((entities) => {
-          this.selectedRoom = room
-          this.entities = entities
-        })
-        .catch((error) => {
-          // eslint-disable-next-line
-          console.error(error)
-          this.isError = true
-        })
-        .finally(() => {
-          this.isLoading = false
-        })
-    },
-    getRooms() {
-      this.isLoading = true
-      coreApi.glados.getRooms()
-        .then((rooms) => {
-          this.rooms = rooms
-        })
-        .catch((error) => {
-          // eslint-disable-next-line
-          console.error(error)
-          this.isError = true
-        })
-        .finally(() => {
-          this.isLoading = false
-        })
-    },
-    createRoom(roomName) {
-      this.isLoading = true
-      coreApi.glados.createRoom(roomName)
-        .then(() => {
-          this.isCreating = false
-          this.getRooms()
-        })
-        .catch((error) => {
-          // eslint-disable-next-line
-          console.error(error)
-          this.isError = true
-        })
-        .finally(() => {
-          this.isLoading = false
-        })
-    },
-    renameRoom(room) {
-      this.isLoading = true
-      coreApi.glados.renameRoom(room)
-        .then(() => {
-          this.isEditing = false
-          this.getRooms()
-        })
-        .catch((error) => {
-          // eslint-disable-next-line
-          console.error(error)
-          this.isError = true
-        })
-        .finally(() => {
-          this.isLoading = false
-        })
-    },
-    deleteRoom() {
-      this.isLoading = true
-      coreApi.glados.deleteRoom(this.selectedRoom.id)
-        .then(() => {
-          this.selectedRoom = null
-          this.isDeleting = false
-          this.getRooms()
-        })
-        .catch((error) => {
-          // eslint-disable-next-line
-          console.error(error)
-          this.isError = true
-        })
-        .finally(() => {
-          this.getRooms()
-          this.isLoading = false
-        })
-    },
-    editRoom(roomName) {
-      if (this.isEditing) {
-        this.selectedRoom.name = roomName
-        this.renameRoom(this.selectedRoom)
-        return
-      }
-      this.createRoom(roomName)
-    },
-    filteredBy(key, option) {
-      if (option === "on" || option === "off") {
-        const statusesList = this.entities.filter(e => e[key] === option)
-        this.statuses[option] = statusesList.length === 0
-
-        return statusesList
-      }
-      return this.entities.filter(e => e[key] === option)
-    },
-    selectEntity(entity) {
-      this.selectedEntity = entity
-    },
-    selectRoom(room) {
-      if (room === this.selectedRoom) {
-        this.selectedRoom = null
-        this.entities = []
-        return
-      }
-      this.selectedRoom = room
-      this.getRoomEntities(room)
-    },
-    getRoomToForm() {
-      if (this.isEditing) return this.selectedRoom
-      return null
-    },
-  } 
 }
 </script>

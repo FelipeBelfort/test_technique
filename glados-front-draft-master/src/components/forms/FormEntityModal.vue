@@ -97,7 +97,7 @@
 </template>
 
 <script>
-import { ENTITY_TYPES, ENTITY_STATUSES } from "@/constants/entityConstants"
+import { ENTITY_STATUSES, ENTITY_TYPES } from "@/constants/entityConstants"
 import Button from "@/components/buttons/Button.vue"
 import Input from "@/components/forms/Input.vue"
 
@@ -118,7 +118,7 @@ export default {
     },
     isEditing: {
       type: Boolean,
-      default: false
+      default: true
     },
     existingEntities: {
       type: Array,

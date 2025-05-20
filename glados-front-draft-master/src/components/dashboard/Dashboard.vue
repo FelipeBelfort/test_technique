@@ -42,46 +42,45 @@
         :key="entity.id">
         <EntityCard
           :entity="entity"
-          @click="selectEntity(entity)"
+          @click="selectedEntity=entity"
           @toggle="toggleEntityStatus(entity)"/>
       </li>
     </ul>
     <EmptyState v-else-if="!isLoading"/>
 
     <EntityDetailsCard
-      v-if="selected"
-      :entity="selected"
+      v-if="selectedEntity"
+      :entity="selectedEntity"
       @edit="showEntityForm=true"
       @delete="isDeleting=true"
-      @close="selected=null"/>
+      @close="selectedEntity=null"/>
 
     <ConfirmDeleteCard 
       v-if="isDeleting"
       itemType="Entity"
-      :obj="selected"
+      :obj="selectedEntity"
       @close="isDeleting=false"
       @confirm="deleteEntity"/>
 
     <FormEntityModal
       v-if="showEntityForm"
-      :entity="selected"
+      :entity="selectedEntity"
       :existingEntities="entities"
       :rooms="rooms"
-      :isEditing="!!selected"
-      @submit="handleFormSubmit"
-      @close="showEntityForm=false; selected=null"/>
+      :isEditing="!!selectedEntity"
+      @submit="handleEntityFormSubmit"
+      @close="showEntityForm=false; selectedEntity=null"/>
   </div>
 </template>
 
 <script>
-import { ENTITY_STATUSES, ENTITY_TYPES } from "@/constants/entityConstants"
 import Button from "@/components/buttons/Button.vue"
 import ConfirmDeleteCard from "@/components/cards/ConfirmDeleteCard.vue"
-import coreApi from "@/providers/core-api"
 import EmptyState from "@/components/emptyState/EmptyState.vue"
 import EntityCard from "@/components/cards/EntityCard.vue"
 import EntityDetailsCard from "@/components/cards/EntityDetailsCard.vue"
 import FormEntityModal from "@/components/forms/FormEntityModal.vue"
+import useEntities from "@/composables/useEntities"
 
 export default {
   name: "Dashboard",
@@ -93,147 +92,45 @@ export default {
     Button,
     ConfirmDeleteCard,
   },
-  created() {
-    this.getEntities()
-    this.getRooms()
-  },
-  data() {
+  setup() {
+    const {
+      entities,
+      rooms,
+      selectedEntity,
+      isLoading,
+      isDeleting,
+      isError,
+      showEntityForm,
+      filters,
+      filterFields,
+      getEntities,
+      getRooms,
+      selectEntity,
+      handleEntityFormSubmit,
+      toggleEntityStatus,
+      deleteEntity
+    } = useEntities()
+
+    getRooms()
+    getEntities()
+
     return {
-      entities: [],
-      rooms: [],
-      selected: null,
-      isLoading: false,
-      isDeleting: false,
-      isError: false,
-      showEntityForm: false,
-      filters: {
-        type: "",
-        status: "",
-        room: ""
-      },
-      filterFields: [
-        {
-          key: "type",
-          label: "Type",
-          options: ENTITY_TYPES 
-        },
-        {
-          key: "status",
-          label: "Status",
-          options: ENTITY_STATUSES 
-        },
-        {
-          key: "room",
-          label: "Room",
-          options: [] 
-        }
-      ]
+      entities,
+      rooms,
+      selectedEntity,
+      isLoading,
+      isDeleting,
+      isError,
+      showEntityForm,
+      filters,
+      filterFields,
+      getEntities,
+      getRooms,
+      selectEntity,
+      handleEntityFormSubmit,
+      toggleEntityStatus,
+      deleteEntity
     }
   },
-  mounted() {
-    this.getEntities()
-  },
-  methods: { 
-    getEntities() {
-      this.isLoading = true
-      coreApi.glados.getEntities(this.filters)
-        .then((entities) => {
-          this.entities = entities
-        })
-        .catch((error) => {
-          // eslint-disable-next-line
-          console.error(error)
-          this.isError = true
-        })
-        .finally(() => {
-          this.filters = {
-            type: "",
-            status: "",
-            room: ""
-          },
-          this.isLoading = false
-        })
-    },
-    getRooms() {
-      this.isLoading = true
-      coreApi.glados.getRooms()
-        .then((rooms) => {
-          this.rooms = rooms
-        })
-        .catch((error) => {
-          // eslint-disable-next-line
-          console.error(error)
-          this.isError = true
-        })
-        .finally(() => {
-          this.filterFields[2].options = this.rooms.map(obj => obj.name)
-          this.isLoading = false
-        })
-    },
-    selectEntity(entity) {
-      this.selected = entity
-    },
-    handleFormSubmit(form) {
-      if (this.selected) {
-        this.modifyEntity(this.selected.id, form)
-      } else {
-        this.isLoading = true
-        coreApi.glados.createEntity(form)
-          .then(() => {
-            this.getEntities()
-          })
-          .catch((error) => {
-            // eslint-disable-next-line
-            console.error(error)
-            this.isError = true
-          }).finally(() => {
-            this.showEntityForm = false
-            this.selected = null
-            this.isLoading = false
-          })
-      }
-    },
-    toggleEntityStatus(entity) {
-      const newStatus = entity.status === "on" ? "off" : "on"
-      this.modifyEntity(entity.id, {"status": newStatus})
-    },
-    modifyEntity(id, json) {
-      this.isLoading = true
-      coreApi.glados.patchEntity(id, json)
-        .then((updated) => {
-          const i = this.entities.findIndex(e => e.id === id)
-          if (i !== -1) {
-            this.entities[i] = updated
-          }
-        })
-        .catch((error) => {
-          // eslint-disable-next-line
-          console.error(error)
-          this.isError = true
-        })
-        .finally(() => {
-          this.showEntityForm = false
-          this.selected = null
-          this.isLoading = false
-        })
-    },
-    deleteEntity() {
-      this.isLoading = true
-      coreApi.glados.deleteEntity(this.selected.id)
-        .then(() => {
-          this.getEntities()
-        })
-        .catch((error) => {
-          // eslint-disable-next-line
-          console.error(error)
-          this.isError = true
-        })
-        .finally(() => {
-          this.isDeleting = false
-          this.selected = null
-          this.isLoading = false
-        })
-    },
-  } 
 }
 </script>

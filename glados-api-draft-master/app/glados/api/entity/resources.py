@@ -5,6 +5,7 @@ from glados.api.entity.serializers import EntitiesRequestSerializer, EntityRespo
 from glados.repositories.entities import get_entities, create_entity, get_entity_by_id
 from glados import db
 
+
 class EntitiesAPI(Resource):
     def get(self):
         request_serializer = EntitiesRequestSerializer()
@@ -14,7 +15,7 @@ class EntitiesAPI(Resource):
 
         serializer = EntityResponseSerializer(many=True)
         return serializer.dump(entities), 200
-    
+
     def post(self):
         request_serializer = EntitiesCreateSerializer()
         data = request_serializer.load(request.get_json())
@@ -34,7 +35,7 @@ class EntitiesDetailsAPI(Resource):
         data = self.request_serializer.load(request.get_json())
         entity = get_entity_by_id(id)
         modified = False
-        for k,v in data.items():
+        for k, v in data.items():
             if getattr(entity, k) != v:
                 setattr(entity, k, v)
                 modified = True

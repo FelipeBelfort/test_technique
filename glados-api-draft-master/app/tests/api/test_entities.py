@@ -218,7 +218,7 @@ def test_post_entity_with_incomplete_data(client, entities, mocker):
     assert response.status_code == 422
     assert response.json == {
         'errors': {
-            'status': ['Missing data for required field.'], 
+            'status': ['Missing data for required field.'],
             'type': ['Missing data for required field.']
         }
     }
