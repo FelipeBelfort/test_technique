@@ -10,7 +10,10 @@
           label="+ Add Entity"/>
       </span>
     </div>
-    <div class="flex flex-row justify-end">
+    <div class="flex flex-row justify-between">
+      <SpeechButton 
+        label="Listen to all"
+        :entities="entities"/>
       <span>
         <span
           v-for="field in filterFields"
@@ -80,6 +83,7 @@ import EmptyState from "@/components/emptyState/EmptyState.vue"
 import EntityCard from "@/components/cards/EntityCard.vue"
 import EntityDetailsCard from "@/components/cards/EntityDetailsCard.vue"
 import FormEntityModal from "@/components/forms/FormEntityModal.vue"
+import SpeechButton from "../buttons/SpeechButton.vue"
 import useEntities from "@/composables/useEntities"
 
 export default {
@@ -91,6 +95,7 @@ export default {
     FormEntityModal,
     Button,
     ConfirmDeleteCard,
+    SpeechButton,
   },
   setup() {
     const {
@@ -105,7 +110,6 @@ export default {
       filterFields,
       getEntities,
       getRooms,
-      selectEntity,
       handleEntityFormSubmit,
       toggleEntityStatus,
       deleteEntity
@@ -126,10 +130,9 @@ export default {
       filterFields,
       getEntities,
       getRooms,
-      selectEntity,
       handleEntityFormSubmit,
       toggleEntityStatus,
-      deleteEntity
+      deleteEntity,
     }
   },
 }

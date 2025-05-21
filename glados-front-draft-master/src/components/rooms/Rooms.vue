@@ -56,18 +56,10 @@
                 <h4 class="font-bold text-indigo-700 capitalize">
                   <div class="flex gap-4 items-center p-2">
                     {{ option.replace(/_/g, " ") }}
-                    <!-- <Button
-                      v-if="option === 'on'"
-                      label="Turn Off All Entities"
-                      size="small"
-                      color="danger"
-                      :disabled="statuses['on']"/>
-                    <Button
-                      v-if="option === 'off'"
-                      label="Turn On All Entities"
-                      size="small"
-                      color="on"
-                      :disabled="statuses['off']"/> -->
+                    <SpeechButton
+                      :entities="roomEntities.filter(e => e[field.key] === option)"
+                      :text="formatString(selectedRoom.name, field.key, option)"
+                      label="List this row"/>
                   </div>
                 </h4>
                 <div class="overflow-x-auto w-full">
@@ -136,8 +128,10 @@ import EntityCard from "@/components/cards/EntityCard.vue"
 import EntityDetailsCard from "@/components/cards/EntityDetailsCard.vue"
 import FormEntityModal from "@/components/forms/FormEntityModal.vue"
 import FormRoomModal from "@/components/forms/FormRoomModal.vue"
+import SpeechButton from "../buttons/SpeechButton.vue"
 import useEntities from "@/composables/useEntities"
 import useRooms from "@/composables/useRooms"
+import useTextToSpeech from "@/composables/useTextToSpeech"
 
 export default {
   name: "Rooms",
@@ -148,7 +142,8 @@ export default {
     Button,
     FormEntityModal,
     FormRoomModal,
-    ConfirmDeleteCard
+    ConfirmDeleteCard,
+    SpeechButton,
   },
   setup() {
     const {
@@ -174,11 +169,12 @@ export default {
       showEntityForm,
       filterFields,
       selectedEntity,
-      selectEntity,
       handleEntityFormSubmit,
       toggleEntityStatus,
       deleteEntity
     } = useEntities()
+
+    const { formatString } = useTextToSpeech()
 
     getRooms()
 
@@ -204,10 +200,11 @@ export default {
       // useEntities
       showEntityForm,
       filterFields,
-      selectEntity,
       handleEntityFormSubmit,
       toggleEntityStatus,
-      deleteEntity
+      deleteEntity,
+      // useTextToSpeech
+      formatString,
     }
   },
 }

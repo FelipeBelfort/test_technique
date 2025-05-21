@@ -60,10 +60,6 @@ export default function useEntities() {
     }
   }
 
-  function selectEntity(entity) {
-    selectedEntity.value = entity
-  }
-
   async function handleEntityFormSubmit(form) {
     isLoading.value = true
     try {
@@ -135,7 +131,6 @@ export default function useEntities() {
     filterFields,
     getEntities,
     getRooms,
-    selectEntity,
     handleEntityFormSubmit,
     toggleEntityStatus,
     deleteEntity
