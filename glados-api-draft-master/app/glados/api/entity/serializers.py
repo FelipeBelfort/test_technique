@@ -4,23 +4,32 @@ from glados import ma, constants
 from glados.models import Entity
 
 
-class EntitiesRequestSerializer(ma.Schema):
+class EntitiesBaseSerializer(ma.Schema):
     type = fields.String(required=False, validate=validate.OneOf([x.name for x in constants.EntityType]))
     status = fields.String(required=False, validate=validate.OneOf([x.name for x in constants.EntityStatus]))
     room = fields.String(required=False)
     id = fields.UUID(required=False)
-    name = fields.String(required=False)
+    name = fields.String(required=False, validate=[
+        validate.Length(max=25),
+        validate.Regexp(r'^[0-9A-Za-zÀ-ÿ\s\-]*$', error="Invalid characters in name")
+    ])
     value = fields.String(required=False, allow_none=True)
     room_id = fields.UUID(required=False, allow_none=True)
 
 
-class EntitiesCreateSerializer(ma.Schema):
-    type = fields.String(required=True, validate=validate.OneOf([x.name for x in constants.EntityType]))
-    status = fields.String(required=True, validate=validate.OneOf([x.name for x in constants.EntityStatus]))
-    id = fields.UUID(required=False)
-    name = fields.String(required=True)
-    value = fields.String(required=True, allow_none=True)
-    room_id = fields.UUID(required=True, allow_none=True)
+class EntitiesRequestSerializer(EntitiesBaseSerializer):
+    pass
+
+
+class EntitiesCreateSerializer(EntitiesBaseSerializer):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.fields["type"].required = True
+        self.fields["status"].required = True
+        self.fields["name"].required = True
+        self.fields["value"].required = True
+        self.fields["room_id"].required = True
 
 
 class EntitySerializer(ma.Schema):

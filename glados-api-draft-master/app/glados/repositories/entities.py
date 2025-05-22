@@ -13,7 +13,9 @@ def get_entities(filters):
         query = query.filter(Entity.status == status)
 
     room = filters.get("room")
-    if room:
+    if room == "@@null@@":
+        query = query.filter(Entity.room_id.is_(None))
+    elif room:
         query = query.join(Room).filter(Room.name.ilike(room))
 
     return query.order_by(Entity.name.asc()).all()

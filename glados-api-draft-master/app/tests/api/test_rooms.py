@@ -80,6 +80,30 @@ def test_post_room_with_incomplete_data(client, rooms, mocker):
     }
 
 
+def test_post_room_with_invalid_character(client, rooms, mocker):
+    response = client.post("/rooms", json={
+        "name": "Kitchen2#"}
+    )
+
+    assert response.status_code == 422
+    assert response.json == {
+        'errors':
+        {'name': ['Invalid characters in name']}
+    }
+
+
+def test_post_room_with_name_too_long(client, rooms, mocker):
+    response = client.post("/rooms", json={
+        "name": "abcdefghijklmnopqrstuvxz12"}
+    )
+
+    assert response.status_code == 422
+    assert response.json == {
+        'errors':
+        {'name': ['Longer than maximum length 25.']}
+    }
+
+
 def test_patch_room(client, rooms, mocker):
     response = client.patch("/rooms/00000000-0000-0000-0000-000000000001", json={"name": "Kitchen2"})
 
@@ -98,6 +122,30 @@ def test_patch_room_with_invalid_data(client, rooms, mocker):
     assert response.json == {
         'errors':
         {'id': ['Not a valid UUID.']}
+    }
+
+
+def test_patch_room_with_invalid_character(client, rooms, mocker):
+    response = client.patch("/rooms/00000000-0000-0000-0000-000000000001", json={
+        "name": "Kitchen2#"}
+    )
+
+    assert response.status_code == 422
+    assert response.json == {
+        'errors':
+        {'name': ['Invalid characters in name']}
+    }
+
+
+def test_patch_room_with_name_too_long(client, rooms, mocker):
+    response = client.patch("/rooms/00000000-0000-0000-0000-000000000001", json={
+        "name": "abcdefghijklmnopqrstuvxz12"}
+    )
+
+    assert response.status_code == 422
+    assert response.json == {
+        'errors':
+        {'name': ['Longer than maximum length 25.']}
     }
 
 

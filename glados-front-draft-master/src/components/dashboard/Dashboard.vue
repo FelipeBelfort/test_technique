@@ -23,6 +23,10 @@
             class="border rounded px-2 py-1 pr-6 text-sm text-gray-700">
             <option value="">{{ field.label }}</option>
             <option
+              v-if="field.key === 'room'"
+              class="text-indigo-900"
+              value="@@null@@">No Room</option>
+            <option
               v-for="option in field.options"
               :key="option"
               class="text-indigo-900"

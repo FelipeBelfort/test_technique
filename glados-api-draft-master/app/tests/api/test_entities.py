@@ -240,6 +240,40 @@ def test_post_entity_with_not_found_room(client, entities, mocker):
     }
 
 
+def test_post_entity_with_invalid_caracter(client, entities, mocker):
+    response = client.post("/entities", json={
+        "name": "Kitchen light#",
+        "type": constants.EntityType.light.name,
+        "status": constants.EntityStatus.off.name,
+        "value": None,
+        "room_id": "00000000-0000-0000-0000-000000000001",
+    })
+
+    print(response.json)
+    assert response.status_code == 422
+    assert response.json == {
+        'errors':
+        {'name': ['Invalid characters in name']}
+    }
+
+
+def test_post_entity_with_name_too_long(client, entities, mocker):
+    response = client.post("/entities", json={
+        "name": "abcdefghijklmnopqrstuvxz12",
+        "type": constants.EntityType.light.name,
+        "status": constants.EntityStatus.off.name,
+        "value": None,
+        "room_id": "00000000-0000-0000-0000-000000000001",
+    })
+
+    print(response.json)
+    assert response.status_code == 422
+    assert response.json == {
+        'errors':
+        {'name': ['Longer than maximum length 25.']}
+    }
+
+
 def test_patch_entity(client, entities, mocker):
     response = client.patch("/entities/00000000-0000-0000-0000-000000000001", json={
         "status": "on",
@@ -256,6 +290,32 @@ def test_patch_entity(client, entities, mocker):
         "created_at": mocker.ANY,
         "room": "Kitchen",
         "room_id": "00000000-0000-0000-0000-000000000001"
+    }
+
+
+def test_patch_entity_with_invalid_caracter(client, entities, mocker):
+    response = client.patch("/entities/00000000-0000-0000-0000-000000000001", json={
+        "name": "Kitchen light#",
+    })
+
+    print(response.json)
+    assert response.status_code == 422
+    assert response.json == {
+        'errors':
+        {'name': ['Invalid characters in name']}
+    }
+
+
+def test_patch_entity_with_name_too_long(client, entities, mocker):
+    response = client.patch("/entities/00000000-0000-0000-0000-000000000001", json={
+        "name": "abcdefghijklmnopqrstuvxz12",
+    })
+
+    print(response.json)
+    assert response.status_code == 422
+    assert response.json == {
+        'errors':
+        {'name': ['Longer than maximum length 25.']}
     }
 
 

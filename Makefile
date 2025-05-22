@@ -1,6 +1,8 @@
 mkfile_path := $(abspath $(lastword $(MAKEFILE_LIST)))
 current_dir := $(patsubst %/,%,$(dir $(mkfile_path)))
 
+all: run
+
 api:
 	docker compose build server
 
@@ -18,16 +20,13 @@ prod:
 
 test:
 	docker compose -f docker-compose-test.yml run --rm server coverage run -m pytest
-	docker compose -f docker-compose-test.yml down
 	
 coverage:
 	docker compose -f docker-compose-test.yml run --rm server coverage report
-	docker compose -f docker-compose-test.yml down
 
 coverage_html:
 	- docker compose -f docker-compose-test.yml run --rm server coverage html
 	@echo "\033[0;32mHTML Report: \033[0;34m${current_dir}/app/coverage/html_coverage/index.html\033[0m"
-	docker compose -f docker-compose-test.yml down
 
 lint_api:
 	flake8 glados-api-draft-master/app --config=glados-api-draft-master/.flake8
